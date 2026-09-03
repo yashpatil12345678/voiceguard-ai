@@ -5,6 +5,7 @@ import tempfile
 
 import numpy as np
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Literal
 
@@ -14,6 +15,13 @@ from voiceguard_inference import VoiceGuardAASIST
 app = FastAPI(
     title="VoiceGuard AI API",
     version="1.0.0",
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://voiceguard-lemon.vercel.app"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 MODEL = VoiceGuardAASIST()
