@@ -105,8 +105,8 @@ async def predict(file: UploadFile = File(...)):
                 wav_path,
             ],
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
 
         import wave
