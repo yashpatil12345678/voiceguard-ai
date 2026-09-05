@@ -44,30 +44,31 @@ class VoiceGuardAASIST:
         ).reshape(-1)
 
         if len(audio) == 0:
-            raise ValueError("Audio input is empty.")
-            peak = np.max(np.abs(audio))
+    raise ValueError("Audio input is empty.")
+
+peak = np.max(np.abs(audio))
 
 if peak > 0:
     audio = audio / peak
 
-        if len(audio) >= self.TARGET_SAMPLES:
+if len(audio) >= self.TARGET_SAMPLES:
 
-            processed = audio[:self.TARGET_SAMPLES]
+    processed = audio[:self.TARGET_SAMPLES]
 
-        else:
+else:
 
-            repeats = int(
-                np.ceil(
-                    self.TARGET_SAMPLES / len(audio)
-                )
-            )
+    repeats = int(
+        np.ceil(
+            self.TARGET_SAMPLES / len(audio)
+        )
+    )
 
-            processed = np.tile(
-                audio,
-                repeats
-            )[:self.TARGET_SAMPLES]
+    processed = np.tile(
+        audio,
+        repeats
+    )[:self.TARGET_SAMPLES]
 
-        return processed.astype(np.float32)
+return processed.astype(np.float32)
 
     def predict(self, audio):
 
