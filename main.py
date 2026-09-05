@@ -32,17 +32,34 @@ class VoiceGuardPredictionResponse(BaseModel):
     sample_rate: int
     input_samples: int
     duration_seconds: float
+
     bona_fide_score: float
     spoof_score: float
-    risk_score: float = Field(ge=0, le=100)
-    risk_level: Literal["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+
+    risk_score: float = Field(
+        ge=0,
+        le=100,
+    )
+
+    risk_level: Literal[
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL",
+    ]
+
     security_action: Literal[
         "MONITOR",
         "WARN",
         "VERIFY",
         "PREVENT + ESCALATE",
     ]
+
     inference_seconds: float
+
+    audio_rms: float
+    audio_peak: float
+    audio_mean: float
 
 
 @app.get("/health")
@@ -55,8 +72,12 @@ def health():
     }
 
 
-@app.post("/predict", response_model=VoiceGuardPredictionResponse)
+@app.post(
+    "/predict",
+    response_model=VoiceGuardPredictionResponse,
+)
 async def predict(file: UploadFile = File(...)):
+
     allowed_extensions = {
         ".wav",
         ".flac",
@@ -87,10 +108,12 @@ async def predict(file: UploadFile = File(...)):
     wav_path = None
 
     try:
+
         with tempfile.NamedTemporaryFile(
             suffix=extension,
             delete=False,
         ) as input_file:
+
             input_file.write(input_bytes)
             input_path = input_file.name
 
@@ -98,6 +121,7 @@ async def predict(file: UploadFile = File(...)):
             suffix=".wav",
             delete=False,
         ) as wav_file:
+
             wav_path = wav_file.name
 
         subprocess.run(
@@ -120,22 +144,38 @@ async def predict(file: UploadFile = File(...)):
         import wave
 
         with wave.open(wav_path, "rb") as wav:
-            sample_rate = wav.getframerate()
-            frames = wav.readframes(wav.getnframes())
 
-        waveform = np.frombuffer(
-            frames,
-            dtype=np.int16,
-        ).astype(np.float32) / 32768.0
+            sample_rate = wav.getframerate()
+
+            frames = wav.readframes(
+                wav.getnframes()
+            )
+
+        waveform = (
+            np.frombuffer(
+                frames,
+                dtype=np.int16,
+            )
+            .astype(np.float32)
+            / 32768.0
+        )
 
         result = MODEL.predict(waveform)
 
         result["audio_rms"] = float(
-            np.sqrt(np.mean(waveform ** 2))
+            np.sqrt(
+                np.mean(
+                    waveform ** 2
+                )
+            )
         )
+
         result["audio_peak"] = float(
-            np.max(np.abs(waveform))
+            np.max(
+                np.abs(waveform)
+            )
         )
+
         result["audio_mean"] = float(
             np.mean(waveform)
         )
@@ -147,18 +187,25 @@ async def predict(file: UploadFile = File(...)):
         return result
 
     except subprocess.CalledProcessError:
+
         raise HTTPException(
             status_code=400,
             detail="Unable to decode the uploaded audio file.",
         )
 
     except Exception as exc:
+
         raise HTTPException(
             status_code=500,
             detail=f"Inference failed: {str(exc)}",
         )
 
     finally:
-        for path in (input_path, wav_path):
+
+        for path in (
+            input_path,
+            wav_path,
+        ):
+
             if path and os.path.exists(path):
                 os.remove(path)
