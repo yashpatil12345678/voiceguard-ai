@@ -45,6 +45,10 @@ class VoiceGuardAASIST:
 
         if len(audio) == 0:
             raise ValueError("Audio input is empty.")
+            peak = np.max(np.abs(audio))
+
+if peak > 0:
+    audio = audio / peak
 
         if len(audio) >= self.TARGET_SAMPLES:
 
