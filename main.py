@@ -124,11 +124,15 @@ async def predict(file: UploadFile = File(...)):
             frames = wav.readframes(wav.getnframes())
 
         waveform = np.frombuffer(
-            frames,
-            dtype=np.int16,
-        ).astype(np.float32) / 32768.0
+          frames,
+          dtype=np.int16,
+       ).astype(np.float32) / 32768.0
 
-        result = MODEL.predict(waveform)
+       result = MODEL.predict(waveform)
+
+       result["audio_rms"] = float(np.sqrt(np.mean(waveform ** 2)))
+       result["audio_peak"] = float(np.max(np.abs(waveform)))
+       result["audio_mean"] = float(np.mean(waveform))
         result["duration_seconds"] = len(waveform) / sample_rate
 
         return result
