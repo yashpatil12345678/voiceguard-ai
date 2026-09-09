@@ -6,7 +6,6 @@ os.environ["MKL_NUM_THREADS"] = "1"
 
 import time
 import numpy as np
-from scipy.signal import butter, sosfilt
 import onnxruntime as ort
 
 
@@ -37,40 +36,12 @@ class VoiceGuardAASIST:
         self.input_name = self.session.get_inputs()[0].name
         self.output_name = self.session.get_outputs()[0].name
 
-    def reduce_background_noise(self, audio):
-
-        audio = np.asarray(
-            audio,
-            dtype=np.float32
-        ).reshape(-1)
-
-        if len(audio) == 0:
-            return audio
-
-        # Lightweight high-pass filter to reduce
-        # low-frequency background noise.
-        sos = butter(
-            4,
-            80,
-            btype="highpass",
-            fs=self.SAMPLE_RATE,
-            output="sos",
-        )
-
-        filtered = sosfilt(
-            sos,
-            audio
-        )
-
-        return filtered.astype(np.float32)
-
     def prepare_audio(self, audio):
 
         audio = np.asarray(
             audio,
             dtype=np.float32
         ).reshape(-1)
-        audio = self.reduce_background_noise(audio)
 
         if len(audio) == 0:
             raise ValueError("Audio input is empty.")
