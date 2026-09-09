@@ -70,6 +70,7 @@ class VoiceGuardAASIST:
             audio,
             dtype=np.float32
         ).reshape(-1)
+        audio = self.reduce_background_noise(audio)
 
         if len(audio) == 0:
             raise ValueError("Audio input is empty.")
