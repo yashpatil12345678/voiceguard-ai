@@ -37,7 +37,8 @@ class VoiceGuardAASIST:
         self.input_name = self.session.get_inputs()[0].name
         self.output_name = self.session.get_outputs()[0].name
 
-        def reduce_background_noise(self, audio):
+    def reduce_background_noise(self, audio):
+
         audio = np.asarray(
             audio,
             dtype=np.float32
@@ -62,6 +63,7 @@ class VoiceGuardAASIST:
         )
 
         return filtered.astype(np.float32)
+
     def prepare_audio(self, audio):
 
         audio = np.asarray(
@@ -71,8 +73,6 @@ class VoiceGuardAASIST:
 
         if len(audio) == 0:
             raise ValueError("Audio input is empty.")
-
-        
 
         if len(audio) >= self.TARGET_SAMPLES:
 
@@ -162,8 +162,8 @@ class VoiceGuardAASIST:
 #   3.75  ->  80 risk
 #   4.94  -> 100 risk
 #
-# These values are an initial benchmark-calibrated policy,
-# not universal scientific risk boundaries.
+# These values are initial benchmark-calibrated policy
+# values, not universal scientific risk boundaries.
 
 RISK_LOW_ANCHOR = 0.52
 RISK_THRESHOLD = 2.25
