@@ -9,6 +9,7 @@ import numpy as np
 import onnxruntime as ort
 
 
+
 class VoiceGuardAASIST:
 
     SAMPLE_RATE = 16000
