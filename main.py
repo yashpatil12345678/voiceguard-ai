@@ -27,6 +27,7 @@ app.add_middleware(
 MODEL = VoiceGuardAASIST()
 
 
+
 class VoiceGuardPredictionResponse(BaseModel):
     model: str
     sample_rate: int
